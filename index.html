@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ironcore первый экран</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=Onest:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Montserrat:wght@800&display=swap">
+<style>
+/* Layout: one viewport-sized hero per variant; logo centered, nav left, single call to action right */
+:root{
+  --sky:#050f1b; --chalk:#ecebe7; --chalk-dim:#a3a8b1;
+  --plaster:#c5bdb4; --graphite:#17191d; --graphite-dim:#4f4c47;
+  --blue:#3b67e6; --blue-hi:#5079ee; --navy:#1f3a93;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-logo:"Montserrat","Arial Black",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--sky)}
+body{background:var(--sky);color:var(--chalk);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--blue-hi);outline-offset:3px;border-radius:4px}
+
+.v-dark{--fg:var(--chalk);--fg-dim:var(--chalk-dim);--accent:var(--blue);--accent-hi:var(--blue-hi);--line:rgba(236,235,231,.34);--mk:var(--chalk);--mk-dot:var(--blue);--mk-2:var(--blue)}
+.v-light{--fg:var(--graphite);--fg-dim:var(--graphite-dim);--accent:var(--navy);--accent-hi:#2a4bb5;--line:rgba(23,25,29,.32);--mk:var(--graphite);--mk-dot:var(--plaster);--mk-2:var(--navy);color:var(--fg)}
+
+.hd{position:absolute;inset:0 0 auto;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
+  padding-top:max(18px,env(safe-area-inset-top,0px));padding-bottom:18px;
+  padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));color:var(--fg)}
+.v-dark .hd{background:linear-gradient(to bottom,rgba(3,8,14,.7),rgba(3,8,14,0))}
+.nav{display:flex;gap:28px;font-size:14px}
+.nav a{opacity:.8;transition:opacity .2s}.nav a:hover{opacity:1}
+.hd-r{display:flex;justify-content:flex-end}
+.burger{display:none;width:40px;height:40px;flex-direction:column;justify-content:center;gap:6px}
+.burger i{display:block;width:22px;height:1.5px;background:currentColor}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-logo);font-weight:800;font-size:22px;letter-spacing:.02em;line-height:1;color:var(--mk)}
+.mark{position:relative;width:30px;height:20px;flex:none}
+.mark i{position:absolute;top:0;width:20px;height:20px;border-radius:50%}
+.mark .m2{left:9px;background:var(--mk-2)}
+.mark .m1{left:0;background:radial-gradient(circle,var(--mk-dot) 0 30%,var(--mk) 32%)}
+.wm{display:flex;align-items:center}
+.wm .o{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin:0 .03em}
+.wm .o.a{background:radial-gradient(circle,var(--mk-dot) 0 30%,var(--mk) 32%)}
+.wm .o.b{background:var(--mk-2)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 22px;border-radius:999px;font-size:15px;font-weight:500;white-space:nowrap;transition:background .2s,border-color .2s}
+.btn-a{background:var(--accent);color:#fff}.btn-a:hover{background:var(--accent-hi)}
+.btn-o{border:1px solid var(--line);color:var(--fg)}.btn-o:hover{border-color:var(--fg)}
+.btn-s{height:40px;padding:0 18px;font-size:14px}
+.ctas{display:flex;gap:10px;flex-wrap:nowrap}
+.mono{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em}
+
+/* section */
+#v-section{background:var(--sky)}
+.scene{position:relative}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.pan{position:absolute;left:50%;top:0;width:max(100vw,96svh);will-change:transform}
+.pan .shot{display:block;width:100%;height:auto;max-width:none;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 7%);mask-image:linear-gradient(to bottom,transparent 0,#000 7%)}
+.pan .shot.off{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+.lights-off .pan .shot.off{opacity:1}
+.horizon{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none;gap:.5em;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.horizon .sub{font-family:var(--f-display);font-weight:400;font-size:clamp(17px,1.9vw,30px);letter-spacing:-.01em;color:var(--chalk)}
+.horizon h1{margin:0;font-family:var(--f-display);font-weight:600;font-size:clamp(38px,7.4vw,132px);line-height:.92;letter-spacing:-.04em;white-space:nowrap;color:var(--chalk)}
+.tag{position:absolute;display:grid;justify-items:start;transform:translate(-7px,-100%);pointer-events:none;opacity:0;transition:opacity .45s}
+.tag .lb{display:grid;gap:2px;padding:0 16px 9px 14px;margin-left:6px;border-bottom:1px solid rgba(236,235,231,.85);white-space:nowrap}
+.tag em{font-style:normal;font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(236,235,231,.62)}
+.tag b{font-weight:500;font-size:15px;letter-spacing:-.01em;color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.7)}
+.tag .ln{display:block;width:1px;height:58px;margin-left:6px;background:linear-gradient(rgba(236,235,231,.9),rgba(236,235,231,.4));transform-origin:top;transform:scaleY(0);transition:transform .7s cubic-bezier(.2,.8,.2,1) .1s}
+.tag .pt{position:relative;display:block;width:14px;height:14px;margin-top:-1px;border-radius:50%;border:1.5px solid #fff;background:rgba(5,15,27,.5)}
+.tag .pt::after{content:"";position:absolute;inset:3px;border-radius:50%;background:#fff}
+.tag .pt::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(255,255,255,.55);animation:ping 2.4s ease-out infinite}
+.tag.show .ln{transform:scaleY(1)}
+@keyframes ping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+.gauge{position:absolute;z-index:14;right:max(28px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);display:grid;gap:14px;justify-items:end}
+.rail{position:relative;height:min(46svh,380px);width:84px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent);mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent)}
+.tape{position:absolute;right:0;top:0;width:100%;will-change:transform}
+.tk{position:absolute;right:0;height:1px;width:8px;background:rgba(236,235,231,.4)}
+.tk.l{width:18px;background:rgba(236,235,231,.85)}
+.tl{position:absolute;right:26px;transform:translateY(-50%);font-family:var(--f-mono);font-size:11px;color:var(--chalk-dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ptr{position:absolute;right:0;top:50%;width:34px;height:2px;margin-top:-1px;background:var(--blue-hi)}
+.ptr::after{content:"";position:absolute;right:0;top:-4px;border:5px solid transparent;border-right-color:var(--blue-hi);border-left:0}
+.read{text-align:right}
+.read strong{display:block;font-family:var(--f-mono);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums;color:var(--chalk)}
+.read span{font-family:var(--f-mono);font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.08em}
+.s-bar{position:absolute;z-index:15;inset:auto 0 0;display:flex;justify-content:center;
+  padding-top:80px;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));
+  padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));
+  background:linear-gradient(to top,rgba(3,6,10,.7),rgba(3,6,10,0))}
+.hot{position:absolute;z-index:16;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));opacity:0;pointer-events:none;
+  transform:translate(-50%,24px);transition:opacity .45s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.hot.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.sw{display:flex;align-items:center;gap:12px;height:52px;padding:0 22px 0 6px;border-radius:999px;color:#fff;font-size:15px;font-weight:500;white-space:nowrap;
+  background:rgba(8,14,22,.6);border:1px solid rgba(236,235,231,.24);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:border-color .2s,background .2s}
+.sw:hover{border-color:rgba(236,235,231,.6);background:rgba(8,14,22,.75)}
+.bulb{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#f6e9b0;color:#3a2e05;box-shadow:0 0 24px rgba(246,233,176,.55);transition:background .35s,color .35s,box-shadow .35s}
+.bulb svg{width:19px;height:19px}
+.sw[aria-pressed="false"] .bulb{background:rgba(255,255,255,.12);color:var(--chalk);box-shadow:none}
+.flick .pan .shot.off{animation:flick .7s linear forwards}
+@keyframes flick{0%{opacity:1}18%{opacity:.25}28%{opacity:.95}42%{opacity:.1}55%{opacity:.7}70%{opacity:.05}100%{opacity:0}}
+
+/* model */
+#v-model{background:var(--plaster)}
+.model{position:relative;height:max(640px,100svh);overflow:hidden;touch-action:pan-y}
+.shots{position:absolute;left:50%;top:53%;width:min(80vw,130svh);aspect-ratio:16/9;max-width:none;transform:translate(-50%,-50%);
+  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 52%,#000 76%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 52%,#000 76%,transparent 100%)}
+.shots img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;opacity:0;transform:scale(1.03);transition:opacity 1s ease,transform 2.2s cubic-bezier(.2,.7,.2,1)}
+.shots img.on{opacity:1;transform:scale(1)}
+.m-t{margin:0;font-family:var(--f-body);font-weight:500;font-size:clamp(36px,4.6vw,82px);line-height:1;letter-spacing:-.045em;text-wrap:balance}
+.m-head{position:absolute;z-index:6;left:max(28px,env(safe-area-inset-left,0px));top:calc(108px + env(safe-area-inset-top,0px));display:grid;gap:28px;justify-items:start}
+.m-tail{position:absolute;z-index:5;right:max(28px,env(safe-area-inset-right,0px));bottom:calc(104px + env(safe-area-inset-bottom,0px));text-align:right;display:grid;gap:14px;justify-items:end}
+.m-tail .m-t{font-weight:400;color:var(--graphite)}
+.m-tail p{margin:0}
+.m-tail p:not(.m-t){max-width:34ch;color:var(--fg-dim);font-size:15px}
+.m-cta{display:none}
+.fmts{position:absolute;z-index:6;left:max(28px,env(safe-area-inset-left,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+.fmts-cap{display:flex;align-items:baseline;gap:12px}
+.fmts-cap .mono{font-size:11px;color:var(--graphite-dim);text-transform:uppercase;letter-spacing:.1em}
+.fmts-cap strong{font-weight:500;font-size:16px;color:var(--graphite)}
+.thumbs{display:flex;gap:8px}
+.seg{position:relative;width:96px;aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#d9d3cb;box-shadow:inset 0 0 0 1px rgba(23,25,29,.12);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.seg img{width:100%;height:100%;object-fit:cover;transform:scale(1.45);opacity:.62;transition:opacity .3s;max-width:none}
+.seg::after{content:"";position:absolute;inset:0;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(23,25,29,.12);transition:box-shadow .3s}
+.seg:hover img{opacity:.95}.seg:hover{transform:translateY(-2px)}
+.seg.on img{opacity:1}.seg.on::after{box-shadow:inset 0 0 0 1.5px var(--navy)}
+.seg .pg{position:absolute;left:8px;right:8px;bottom:7px;height:2px;border-radius:2px;background:rgba(23,25,29,.16);overflow:hidden;opacity:0;transition:opacity .3s}
+.seg .pg i{display:block;height:100%;width:0;background:var(--navy)}
+.seg.on .pg{opacity:1}
+.seg.on .pg i{animation:fill var(--dur,5s) linear forwards}
+.paused .seg.on .pg i{animation:none;width:100%}
+@keyframes fill{to{width:100%}}
+
+.switch{position:fixed;z-index:50;right:max(28px,env(safe-area-inset-right,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px));display:flex;gap:4px;padding:4px;border-radius:999px;
+  background:rgba(14,16,20,.82);border:1px solid rgba(236,235,231,.14);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.switch button{height:38px;padding:0 14px;border-radius:999px;font-size:13px;color:var(--chalk-dim);white-space:nowrap}
+.switch button[aria-pressed="true"]{background:var(--chalk);color:var(--graphite)}
+.on-light .switch{background:rgba(236,232,226,.85);border-color:rgba(23,25,29,.14)}
+.on-light .switch button{color:var(--graphite-dim)}
+.on-light .switch button[aria-pressed="true"]{background:var(--graphite);color:#fff}
+
+@media (max-width:900px){
+  .nav{display:none}.burger{display:flex}
+  .hd{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .logo{font-size:18px}.mark{width:26px;height:17px}.mark i{width:17px;height:17px}.mark .m2{left:8px}
+  .hd .btn-s{height:36px;padding:0 14px;font-size:13px}
+  .btn{height:44px;padding:0 18px;font-size:14px}
+  .switch{right:auto;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  .switch button{height:32px;font-size:12px}
+  .s-bar{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  .hot{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  .rail{width:52px}.tl{display:none}
+  .gauge{right:max(12px,env(safe-area-inset-right,0px))}
+.read strong{font-size:16px}
+  .tag b{font-size:13px}.tag .ln{height:36px}
+  .m-head{left:max(16px,env(safe-area-inset-left,0px));top:calc(84px + env(safe-area-inset-top,0px))}
+  .m-tail{right:max(16px,env(safe-area-inset-right,0px));bottom:auto;top:calc(130px + env(safe-area-inset-top,0px))}
+  .m-tail p:not(.m-t){display:none}
+  .shots{width:132vw;top:50%}
+  .m-head .ctas{display:none}
+  .m-cta{position:absolute;z-index:6;left:0;right:0;display:flex;justify-content:center;bottom:calc(62px + env(safe-area-inset-bottom,0px))}
+  .fmts{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(122px + env(safe-area-inset-bottom,0px))}
+  .seg{width:auto;flex:1}
+}
+@media (prefers-reduced-motion:reduce){.shots img,.pan .shot.off,.lamp .ic{transition:none}.seg.on i{animation:none;width:100%}}
+</style>
+
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<nav class="switch" aria-label="Варианты первого экрана">
+  <button type="button" id="sw-section" data-v="section" aria-pressed="true">Срез земли</button>
+  <button type="button" id="sw-model" data-v="model" aria-pressed="false">Макет</button>
+</nav>
+
+<template id="hd-tpl">
+  <header class="hd">
+    <nav class="nav" aria-label="Разделы"><a href="#formats">Форматы</a><a href="#projects">Проекты</a><a href="#about">О компании</a></nav>
+    <button class="burger" type="button" aria-label="Меню"><i></i><i></i></button>
+    <a class="logo" href="#top" aria-label="Ironcore">
+      <span class="mark" aria-hidden="true"><i class="m2"></i><i class="m1"></i></span>
+      <span class="wm" aria-hidden="true">IR<b class="o a"></b>NC<b class="o b"></b>RE</span>
+    </a>
+    <div class="hd-r"><a class="btn btn-a btn-s" href="#contact">Связаться</a></div>
+  </header>
+</template>
+
+<section class="variant v-dark" id="v-section" data-v="section">
+  <div class="scene" id="s-scene">
+    <div class="stage" id="s-stage">
+      <div class="pan" id="s-pan">
+        <img class="shot" id="s-img" src="img/section-on.webp" alt="Разрез участка: корпус и контейнерные модули на поверхности, модульный зал под землёй">
+        <img class="shot off" src="img/section-off.webp" alt="">
+        <div class="horizon" id="s-hz">
+          <span class="sub">начинается с проекта</span>
+          <h1>Защищённость</h1>
+        </div>
+        <div class="tag" style="left:30%;top:13.6%"><span class="lb"><em>Формат</em><b>Классический корпус</b></span><i class="ln"></i><i class="pt"></i></div>
+        <div class="tag" style="left:72%;top:20.5%"><span class="lb"><em>Формат</em><b>Контейнерные модули</b></span><i class="ln"></i><i class="pt"></i></div>
+        <div class="tag" style="left:48%;top:56.5%"><span class="lb"><em>Формат</em><b>Модульные залы под землёй</b></span><i class="ln"></i><i class="pt"></i></div>
+      </div>
+      <div class="hd-slot"></div>
+      <div class="gauge" aria-hidden="true">
+        <div class="rail"><div class="tape" id="s-tape"></div><div class="ptr"></div></div>
+        <div class="read"><strong id="s-depth">0,0 м</strong><span id="s-zone">уровень земли</span></div>
+      </div>
+      <div class="hot" id="s-hot">
+        <button class="sw" type="button" id="s-lamp" aria-pressed="true">
+          <span class="bulb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2l.1.7h4.8l.1-.7c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg></span>
+          <span id="s-lamp-lbl">Выключить свет в зале</span>
+        </button>
+      </div>
+      <div class="s-bar" id="s-bar">
+        <div class="ctas"><a class="btn btn-a" href="#contact">Обсудить проект</a><a class="btn btn-o" href="#solutions">Наши решения</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="variant v-light" id="v-model" data-v="model" hidden>
+  <div class="model" id="m-hero">
+    <div class="shots" id="m-shots">
+      <img class="on" src="img/m-classic.webp" alt="Гипсовый макет классического дата-центра">
+      <img src="img/m-modular.webp" alt="Гипсовый макет модульного дата-центра">
+      <img src="img/m-container.webp" alt="Гипсовый макет контейнерного дата-центра">
+      <img src="img/m-under.webp" alt="Гипсовый макет подземного дата-центра в разрезе">
+    </div>
+    <div class="hd-slot"></div>
+    <div class="m-head"><h1 class="m-t">Защищённость</h1><div class="ctas"><a class="btn btn-a" href="#contact">Обсудить проект</a><a class="btn btn-o" href="#solutions">Наши решения</a></div></div>
+    <div class="m-tail"><p class="m-t">начинается с проекта</p><p>Проектируем дата-центры четырёх форматов под задачи и площадку заказчика</p></div>
+    <div class="m-cta"><div class="ctas"><a class="btn btn-a" href="#contact">Обсудить проект</a><a class="btn btn-o" href="#solutions">Наши решения</a></div></div>
+    <div class="fmts" id="m-plate" role="group" aria-label="Форматы">
+      <div class="fmts-cap"><span class="mono">Макет 1:500</span><strong id="m-name" aria-live="polite">Классический ЦОД</strong></div>
+      <div class="thumbs" id="m-segs"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const tpl=document.getElementById('hd-tpl');
+  document.querySelectorAll('.hd-slot').forEach(s=>s.replaceWith(tpl.content.cloneNode(true)));
+  document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+  const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)), seg=(p,a,b)=>clamp((p-a)/(b-a));
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const views=['section','model'];let cur='section';
+
+  function show(v,scroll){
+    if(!views.includes(v))v='section';cur=v;
+    document.querySelectorAll('.variant').forEach(s=>s.hidden=s.dataset.v!==v);
+    document.querySelectorAll('.switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+    document.body.classList.toggle('on-light',v==='model');
+    if(scroll!==false)window.scrollTo(0,0);
+    if(v==='section'){layoutSection();section()}
+    if(v==='model')startAuto();else stopAuto();
+  }
+  document.querySelectorAll('.switch button').forEach(b=>b.addEventListener('click',()=>{
+    try{history.replaceState(null,'','#'+b.dataset.v)}catch(e){}
+    show(b.dataset.v);
+  }));
+  addEventListener('hashchange',()=>show(location.hash.slice(1)));
+
+  /* section */
+  const sScene=document.getElementById('s-scene'),sStage=document.getElementById('s-stage'),sPan=document.getElementById('s-pan'),sImg=document.getElementById('s-img'),
+        sHz=document.getElementById('s-hz'),sTape=document.getElementById('s-tape'),sBar=document.getElementById('s-bar'),
+        sDepth=document.getElementById('s-depth'),sZone=document.getElementById('s-zone'),sTags=[...document.querySelectorAll('#s-pan .tag')],
+        lamp=document.getElementById('s-lamp'),lampLbl=document.getElementById('s-lamp-lbl'),sHot=document.getElementById('s-hot');
+  const HZ=.114,GROUND=.30,MAXD=45;let imgH=0,top0=0,travel=0;
+  const PX=14;
+  for(let d=0;d<=MAXD;d++){const t=document.createElement('div');t.className='tk'+(d%5===0?' l':'');t.style.top=(d*PX)+'px';sTape.appendChild(t);
+    if(d%5===0){const l=document.createElement('div');l.className='tl';l.style.top=(d*PX)+'px';l.textContent=d?'−'+d+' м':'0 м';sTape.appendChild(l)}}
+  function layoutSection(){
+    const w=sPan.getBoundingClientRect().width||innerWidth;
+    imgH=w*(2528/1696);
+    top0=Math.round(innerHeight*(innerWidth<900?.30:.26));
+    travel=Math.max(0,imgH+top0-innerHeight);
+    sScene.style.height=(innerHeight+travel*1.25)+'px';
+    sHz.style.top=(HZ*imgH-sHz.getBoundingClientRect().height-Math.max(10,imgH*.006))+'px';
+  }
+  function section(){
+    const r=sScene.getBoundingClientRect(),p=clamp(-r.top/Math.max(1,r.height-innerHeight)),y=top0-travel*p;
+    sPan.style.transform=`translate(-50%,${y}px)`;
+    sHz.style.opacity=String(1-seg(p,.03,.15));
+    sTags.forEach(t=>{const ty=y+parseFloat(t.style.top)/100*imgH;const o=Math.min(seg(p,.06,.14),seg(innerHeight*.9-ty,0,innerHeight*.2));t.style.opacity=String(o);t.style.transform=`translate(-7px,calc(-100% + ${(1-o)*18}px))`;t.classList.toggle('show',o>.4)});
+    const c=(innerHeight*.5-y)/imgH,d=clamp((c-GROUND)/(1-GROUND))*MAXD;
+    const rh=sTape.parentNode.clientHeight;sTape.style.transform=`translateY(${rh/2-d*PX}px)`;
+    sBar.style.transform=`translateY(${y-top0}px)`;sBar.style.opacity=String(1-seg(p,.03,.15));sBar.style.pointerEvents=p>.1?'none':'';
+    sDepth.textContent=(d<.05?'0,0':'−'+d.toFixed(1).replace('.',','))+' м';
+    sHot.classList.toggle('show',c>.46&&c<.95);
+    sZone.textContent=d<.05?'уровень земли':(c>.47&&c<.84?'подземный зал':'грунт');
+  }
+  lamp.addEventListener('click',()=>{
+    const on=lamp.getAttribute('aria-pressed')!=='true';
+    lamp.setAttribute('aria-pressed',on);sStage.classList.toggle('lights-off',!on);
+    lampLbl.textContent=on?'Выключить свет в зале':'Включить свет в зале';
+    if(on&&!reduce){sStage.classList.add('flick');setTimeout(()=>sStage.classList.remove('flick'),720)}
+  });
+
+  /* model */
+  const shots=[...document.querySelectorAll('#m-shots img')],names=['Классический ЦОД','Модульный ЦОД','Контейнерный ЦОД','Подземный ЦОД'],
+        segsBox=document.getElementById('m-segs'),plate=document.getElementById('m-plate'),nameEl=document.getElementById('m-name'),hero=document.getElementById('m-hero');
+  const DUR=5200;let idx=0,timer=null,paused=false;
+  plate.style.setProperty('--dur',DUR+'ms');
+  const segs=names.map((n,i)=>{const b=document.createElement('button');b.type='button';b.className='seg';b.id='seg-'+i;b.setAttribute('aria-label',n);b.innerHTML='<img src="'+shots[i].getAttribute('src')+'" alt=""><span class="pg"><i></i></span>';
+    b.addEventListener('click',()=>pick(i));segsBox.appendChild(b);return b});
+  function setFmt(i){
+    idx=(i+shots.length)%shots.length;
+    shots.forEach((im,k)=>im.classList.toggle('on',k===idx));
+    segs.forEach((s,k)=>{s.classList.remove('on');s.setAttribute('aria-current',k===idx?'true':'false')});
+    void segsBox.offsetWidth;segs[idx].classList.add('on');nameEl.textContent=names[idx];
+  }
+  function pick(i){paused=true;plate.classList.add('paused');stopAuto();setFmt(i)}
+  function startAuto(){stopAuto();if(paused||reduce)return;timer=setInterval(()=>setFmt(idx+1),DUR)}
+  function stopAuto(){clearInterval(timer);timer=null}
+  addEventListener('keydown',e=>{if(cur!=='model')return;if(e.key==='ArrowRight')pick(idx+1);if(e.key==='ArrowLeft')pick(idx-1)});
+  let sx=null;
+  hero.addEventListener('pointerdown',e=>{if(!e.target.closest('button,a'))sx=e.clientX});
+  hero.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40)pick(idx+(dx<0?1:-1))});
+  setFmt(0);
+
+  let raf=0;addEventListener('scroll',()=>{if(cur==='section'&&!raf)raf=requestAnimationFrame(()=>{raf=0;section()})},{passive:true});
+  addEventListener('resize',()=>{if(cur==='section'){layoutSection();section()}});
+  sImg.addEventListener('load',()=>{layoutSection();section()});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(cur==='section'){layoutSection();section()}});
+  show(location.hash.slice(1)||'section',false);
+})();
+</script>
+</body>
+</html>
