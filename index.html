@@ -27,6 +27,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--blue-hi);outline-offset:3px;border-radius:4px}
 .variant{overflow-x:clip}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
 
 .v-dark{--fg:var(--chalk);--fg-dim:var(--chalk-dim);--accent:var(--blue);--accent-hi:var(--blue-hi);--line:rgba(236,235,231,.34);--mk:var(--chalk);--mk-dot:var(--blue);--mk-2:var(--blue)}
 .v-light{--fg:var(--graphite);--fg-dim:var(--graphite-dim);--accent:var(--navy);--accent-hi:#2a4bb5;--line:rgba(23,25,29,.32);--mk:var(--graphite);--mk-dot:var(--plaster);--mk-2:var(--navy);color:var(--fg)}
@@ -281,6 +284,7 @@ a{color:inherit;text-decoration:none}
   </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script>
 (function(){
   const tpl=document.getElementById('hd-tpl');
@@ -289,13 +293,19 @@ a{color:inherit;text-decoration:none}
   const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const views=['section','model'];let cur='section';
+  let lenis=null;
+  if(window.Lenis&&!reduce&&matchMedia('(pointer: fine)').matches){
+    lenis=new Lenis({lerp:.085,wheelMultiplier:.9,smoothWheel:true,syncTouch:false});
+    const loop=t=>{lenis.raf(t);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+  }
+  const toTop=()=>{if(lenis)lenis.scrollTo(0,{immediate:true});else window.scrollTo(0,0)};
 
   function show(v,scroll){
     if(!views.includes(v))v='section';cur=v;
     document.querySelectorAll('.variant').forEach(s=>s.hidden=s.dataset.v!==v);
     document.querySelectorAll('.switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
     document.body.classList.toggle('on-light',v==='model');
-    if(scroll!==false)window.scrollTo(0,0);
+    if(scroll!==false)toTop();
     if(v==='section'){layoutSection();update()}
     if(v==='model')startAuto();else stopAuto();
   }
@@ -369,6 +379,7 @@ a{color:inherit;text-decoration:none}
   const menu=document.getElementById('menu');let opener=null;
   function setMenu(open){
     menu.classList.toggle('open',open);document.documentElement.classList.toggle('no-scroll',open);
+    if(lenis){open?lenis.stop():lenis.start()}
     document.querySelectorAll('.burger').forEach(b=>b.setAttribute('aria-expanded',open));
     if(open)document.getElementById('menu-x').focus();else if(opener)opener.focus();
   }
