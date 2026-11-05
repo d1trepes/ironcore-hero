@@ -21,12 +21,12 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--sky);overscroll-behavior:none;-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{overscroll-behavior:none;overflow-x:hidden;background:var(--sky);color:var(--chalk);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+html{background:var(--sky);overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{overscroll-behavior:none;background:var(--sky);color:var(--chalk);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--blue-hi);outline-offset:3px;border-radius:4px}
-.variant{overflow-x:hidden;overflow-x:clip}
+.variant{overflow-x:clip}
 
 .v-dark{--fg:var(--chalk);--fg-dim:var(--chalk-dim);--accent:var(--blue);--accent-hi:var(--blue-hi);--line:rgba(236,235,231,.34);--mk:var(--chalk);--mk-dot:var(--blue);--mk-2:var(--blue)}
 .v-light{--fg:var(--graphite);--fg-dim:var(--graphite-dim);--accent:var(--navy);--accent-hi:#2a4bb5;--line:rgba(23,25,29,.32);--mk:var(--graphite);--mk-dot:var(--plaster);--mk-2:var(--navy);color:var(--fg)}
@@ -194,7 +194,7 @@ a{color:inherit;text-decoration:none}
   .m-tail{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:auto;top:calc(122px + env(safe-area-inset-top,0px));text-align:left;justify-items:start}
   .m-t{font-size:34px}
   .m-tail p:not(.m-t){display:none}
-  .shots{width:104vw;top:49%}
+  .shots{width:118vw;top:50%}
   .m-head .ctas{display:none}
   .m-cta{position:absolute;z-index:6;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;bottom:calc(62px + env(safe-area-inset-bottom,0px))}
   .fmts{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(122px + env(safe-area-inset-bottom,0px))}
@@ -243,7 +243,7 @@ a{color:inherit;text-decoration:none}
         <h1>Защищённость</h1>
       </div>
       <div class="tag" style="left:34%;top:18.6%"><span class="lb"><em>Формат</em><b>Классический корпус</b></span><i class="ln"></i><i class="pt"></i></div>
-      <div class="tag r" style="left:73%;top:24.6%"><span class="lb"><em>Формат</em><b>Контейнерные модули</b></span><i class="ln"></i><i class="pt"></i></div>
+      <div class="tag r" style="left:66%;top:25.4%"><span class="lb"><em>Формат</em><b>Контейнерные модули</b></span><i class="ln"></i><i class="pt"></i></div>
       <div class="tag" style="left:44%;top:62%"><span class="lb"><em>Формат</em><b>Модульные залы под землёй</b></span><i class="ln"></i><i class="pt"></i></div>
     </div>
     <div class="s-bar" id="s-bar">
@@ -317,7 +317,7 @@ a{color:inherit;text-decoration:none}
   let VH=innerHeight,imgH=0,top0=0,railH=0,last={};
   function layoutSection(){
     VH=innerHeight;
-    const W=document.documentElement.clientWidth,panW=Math.round(Math.max(W,VH*.96));
+    const W=document.documentElement.clientWidth,panW=Math.round(Math.max(W,VH*(W<900?1.06:.96)));
     imgH=panW*(2528/1696);
     top0=Math.round(VH*(W<900?.27:.25));
     pan.style.width=panW+'px';pan.style.marginLeft=Math.round((W-panW)/2)+'px';
